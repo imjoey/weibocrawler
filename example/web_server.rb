@@ -2,6 +2,7 @@
 
 require 'weibo_2'
 require 'time-ago-in-words'
+require 'json'
 
 %w(rubygems bundler).each { |dependency| require dependency }
 Bundler.setup
@@ -59,6 +60,30 @@ end
 get '/screen.css' do
   content_type 'text/css'
   sass :screen
+end
+
+# add /statuses interface to show latest statuses as the json output
+get '/statuses' do
+  client = WeiboOAuth2::Client.new
+
+  # Check the session and get the token obj
+  if session[:access_token] && !client.authorized?
+    token = client.get_token_from_hash({:access_token => session[:access_token], :expires_at => session[:expires_at]})
+    unless token.validated?
+      reset_session
+      redirect '/connect'
+      return
+    end
+  end
+
+  # Get the latest statuses timeline
+  if session[:uid]
+    @user = client.users.show_by_uid(session[:uid])
+    @statuses = client.statuses
+  end
+
+  JSON.generate(@statuses.friends_timeline.statuses)
+  
 end
 
 post '/update' do
