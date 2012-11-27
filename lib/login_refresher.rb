@@ -1,15 +1,16 @@
+# encoding: utf-8
 require 'selenium-webdriver'
 
 # initialize the global variables
 driver = Selenium::WebDriver.for :firefox
-wait = Selenium::WebDriver::Wait.new(:timeout => 30)
+wait = Selenium::WebDriver::Wait.new(:timeout => 60)
 
 # first open the pre-logined weibo account
-driver.get 'http://m.weibo.com/joey016'
-wait.until { driver.title.downcase.start_with? 'thanksjoey' }
+driver.get 'http://weibo.com'
+wait.until { driver.title.start_with? '新浪微博' }
 
 loop do
-  # then visit the /connect to refresh code
+  # then visit the /index to refresh code
   driver.get 'http://localhost:4567/connect'
 =begin
   # fill in the user id input-field
@@ -23,10 +24,8 @@ loop do
   element2.send_keys 'joeyyeoj321'
   element2.submit
 =end
-  puts "Page title is #{driver.title}"
-  #wait.until { driver.title.downcase.start_with? 'weibo oauth2' }
 
-  sleep 15
+  sleep 36000
 
 end
 
