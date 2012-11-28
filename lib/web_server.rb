@@ -69,7 +69,8 @@ get '/statuses' do
 
   # Check the session and get the token obj
   if session[:access_token] && !client.authorized?
-    token = client.get_token_from_hash({:access_token => session[:access_token], :expires_at => session[:expires_at]})
+    token = client.get_token_from_hash(
+      {:access_token => session[:access_token], :expires_at => session[:expires_at]})
     unless token.validated?
       reset_session
       redirect '/connect'
@@ -85,15 +86,14 @@ get '/statuses' do
 
   coll = Mongo::Connection.new('localhost', 27017).db('weibo')['statuses']
 
-  #@statuses.friends_timeline({:since_id => params[:since_id].to_i}).statuses.each { |status| coll.insert(status) }
-
-  JSON.generate(@statuses.friends_timeline({:since_id => params[:since_id].to_i}).statuses)
-  
+  @statuses.friends_timeline(
+    {:since_id => params[:since_id].to_i}).statuses.each { |status| coll.insert(status) }  
 end
 
 post '/update' do
   client = WeiboOAuth2::Client.new
-  client.get_token_from_hash({:access_token => session[:access_token], :expires_at => session[:expires_at]})
+  client.get_token_from_hash(
+    {:access_token => session[:access_token], :expires_at => session[:expires_at]})
   statuses = client.statuses
 
   unless params[:file] && (tmpfile = params[:file][:tempfile]) && (name = params[:file][:filename])
