@@ -3,6 +3,7 @@
 require 'weibo_2'
 require 'time-ago-in-words'
 require 'json'
+require 'mongo'
 
 %w(rubygems bundler).each { |dependency| require dependency }
 Bundler.setup
@@ -82,7 +83,11 @@ get '/statuses' do
     @statuses = client.statuses
   end
 
-  JSON.generate(@statuses.friends_timeline.statuses)
+  coll = Mongo::Connection.new('localhost', 27017).db('weibo')['statuses']
+
+  @statuses.friends_timeline.statuses.each { |status| coll.insert(status) }
+
+  coll.find.each { |row| puts row.inspect }
   
 end
 
