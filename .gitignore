@@ -16,4 +16,5 @@ test/tmp
 test/version_tmp
 tmp
 lib/.sass-cache
+.sass-cache
 lib/runwebapp.sh
