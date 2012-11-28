@@ -85,9 +85,9 @@ get '/statuses' do
 
   coll = Mongo::Connection.new('localhost', 27017).db('weibo')['statuses']
 
-  @statuses.friends_timeline.statuses.each { |status| coll.insert(status) }
+  #@statuses.friends_timeline({:since_id => params[:since_id].to_i}).statuses.each { |status| coll.insert(status) }
 
-  coll.find.each { |row| puts row.inspect }
+  JSON.generate(@statuses.friends_timeline({:since_id => params[:since_id].to_i}).statuses)
   
 end
 
