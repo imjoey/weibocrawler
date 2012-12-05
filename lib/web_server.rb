@@ -29,6 +29,24 @@ get '/' do
     @user = client.users.show_by_uid(session[:uid])
     @statuses = client.statuses
   end
+  "<div id='success'>Load / page successfully</div>"
+end
+
+get '/index' do
+  client = WeiboOAuth2::Client.new
+  if session[:access_token] && !client.authorized?
+    token = client.get_token_from_hash({:access_token => session[:access_token], :expires_at => session[:expires_at]})
+
+    unless token.validated?
+      reset_session
+      redirect '/connect'
+      return
+    end
+  end
+  if session[:uid]
+    @user = client.users.show_by_uid(session[:uid])
+    @statuses = client.statuses
+  end
   haml :index
 end
 
@@ -40,8 +58,10 @@ end
 get '/callback' do
   client = WeiboOAuth2::Client.new
   access_token = client.auth_code.get_token(params[:code].to_s)
-  p "^^^^^^^^^" + params[:code]
+
   session[:uid] = access_token.params["uid"]
+  p '#####################' + session[:uid]
+
   session[:access_token] = access_token.token
   session[:expires_at] = access_token.expires_at
 
@@ -75,6 +95,7 @@ get '/statuses' do
   end
 
   # Get the latest statuses timeline
+  p '#####################' + session[:uid]
   if session[:uid]
     @user = client.users.show_by_uid(session[:uid])
     @statuses = client.statuses
@@ -107,8 +128,8 @@ get '/statuses' do
       status_coll.insert(status)
       count = count + 1
     end
-  "Add #{count} weibo tweets with since_id=#{past_id.to_s}"
-end
+  "<div id='success'>Add #{count} weibo tweets with since_id=#{past_id.to_s}</div>"
+  end
 
 post '/update' do
   client = WeiboOAuth2::Client.new
