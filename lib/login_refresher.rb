@@ -8,14 +8,15 @@ count = 100
 loop do
   # then visit the /connect to refresh code
   if count == 100
-    driver.get 'http://localhost:4567/connect'
-    wait.until { driver.title.start_with? 'weibo oauth2' }
+    driver.get 'http://127.0.0.1:4567/connect'
+    # wait.until { driver.find_element(:id => 'success') }
+    sleep 120
     count = 0
   end
 
   # load statuses into mongodb
-  driver.get 'http://localhost:4567/statuses'
-  wait.until { driver.body.start_with? 'Add' }
+  driver.get 'http://127.0.0.1:4567/statuses'
+  wait.until { driver.find_element(:id => 'success') }
 
   # every 6 minues do the statuses loading
   sleep 360
